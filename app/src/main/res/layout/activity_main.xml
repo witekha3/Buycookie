@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_image"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/productBtn"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="-80dp"
+            android:layout_marginTop="200dp"
+            android:background="#00FCFBFB"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/cake_image" />
+
+        <ImageButton
+            android:id="@+id/clientsBtn"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="-105dp"
+            android:background="#00FFFFFF"
+
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/clients_image" />
+
+        <ImageButton
+            android:id="@+id/printerBtn"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="-80dp"
+            android:layout_marginTop="50dp"
+            android:background="#00FFFFFF"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/print_image" />
+
+        <ImageButton
+            android:id="@+id/orderBtn"
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="80dp"
+            android:layout_marginTop="-105dp"
+            android:background="#00FFFFFF"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/order_image" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

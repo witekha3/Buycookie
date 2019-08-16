@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_image"
+    tools:context=".AddClient">
+
+    <LinearLayout
+        android:id="@+id/errorTxt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/akronimTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#6B21B9F3"
+            android:ems="10"
+            android:hint="Akronim"
+            android:inputType="textPersonName"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/companyNameTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#6B21B9F3"
+            android:ems="10"
+            android:hint="Nazwa firmy"
+            android:inputType="textPersonName"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/nipTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#6B21B9F3"
+            android:ems="10"
+            android:hint="NIP"
+            android:inputType="phone"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/dicTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#6B21B9F3"
+            android:ems="10"
+            android:hint="DIC"
+            android:inputType="textPersonName"
+            android:padding="5dp" />
+
+        <EditText
+            android:id="@+id/adressTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#6B21B9F3"
+            android:ems="10"
+            android:hint="Adres"
+            android:inputType="textPersonName"
+            android:padding="5dp" />
+
+        <CheckBox
+            android:id="@+id/haveVatCheckBox"
+            android:layout_width="106dp"
+            android:layout_height="49dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="Vat?" />
+
+        <Button
+            android:id="@+id/saveClientBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="#001DFF"
+            android:text="Zapisz"
+            android:textColor="#FF0000" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            android:layout_marginTop="40dp" />
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
