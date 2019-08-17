@@ -25,19 +25,18 @@ public class ShowProducts extends AppCompatActivity  {
         arrayList = new ArrayList<String>();
         itemsArray = new ArrayList<String >();
         ListView listView = (ListView) findViewById(R.id.productsList);
+        itemsArray = new ArrayList<String >();
         for (Products product : products.listOfProducts) {
             itemsArray.add(product.polishName);
         }
 
         for(String product : itemsArray){
+
             adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
             listView.setAdapter(adapter);
             arrayList.add(product);
             adapter.notifyDataSetChanged();
             System.out.println(product);
         }
-
-
-
     }
 }

@@ -4,18 +4,22 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 public class FileManager {
-    String root = Environment.getExternalStorageDirectory().getAbsolutePath();
-
 
     public static String convertStreamToString(InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -49,5 +53,34 @@ public class FileManager {
             System.out.println("error: "+e);
         }
         return text;
+    }
+
+    public void saveDataToProductsTxt(String text){
+        //final File file = new File(Environment.getExternalStorageDirectory()
+        //        .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "products");
+        File out;
+        OutputStreamWriter outStreamWriter = null;
+        FileOutputStream outStream = null;
+
+        out = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "products");
+        try {
+            outStream = new FileOutputStream(out, true);
+            outStreamWriter = new OutputStreamWriter(outStream);;
+            try {
+                outStreamWriter.append("\n"+text);
+                outStreamWriter.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public void deleteFromProductsTxt(String name){
+
     }
 }

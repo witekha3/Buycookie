@@ -14,9 +14,13 @@
 
         <ListView
             android:id="@+id/productsList"
+            style="@android:style/Widget.DeviceDefault.Light.ExpandableListView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:drawSelectorOnTop="false" >
+            android:background="#004257EB"
+            android:cacheColorHint="#4D54EB"
+            android:clickable="false"
+            android:drawSelectorOnTop="false">
 
         </ListView>
     </LinearLayout>

@@ -7,5 +7,91 @@
     android:background="@drawable/background_image"
     tools:context=".AddProduct">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/productNameTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#6B21B9F3"
+            android:padding="5dp"
+            android:layout_marginTop="30dp"
+            android:ems="10"
+            android:hint="Nazwa produktu"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/slovakianNameTxt"
+            android:layout_marginTop="30dp"
+            android:background="#6B21B9F3"
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Nazwa po słowacku"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/weightTxt"
+            android:layout_width="match_parent"
+            android:background="#6B21B9F3"
+            android:padding="5dp"
+            android:layout_marginTop="30dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Domyślna waga / ilość"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/priceTxt"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:background="#6B21B9F3"
+            android:padding="5dp"
+            android:hint="Cena"
+            android:inputType="number" />
+
+        <CheckBox
+            android:id="@+id/isBigCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="LUZ" />
+
+        <CheckBox
+            android:id="@+id/isSmallCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="PORCJA" />
+
+        <CheckBox
+            android:id="@+id/isMediumCheckBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="TACKA" />
+
+        <Button
+            android:id="@+id/addProductBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Dodaj"
+            android:background="#001DFF"
+            android:textColor="#FF0000" />
+
+        <TextView
+            android:id="@+id/errorTxt"
+            android:layout_width="match_parent"
+            android:layout_marginTop="40dp"
+            android:layout_height="wrap_content" />
+        android:visibility="addProductsBtn" />
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
 
