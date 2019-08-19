@@ -13,9 +13,9 @@ public class ProductsManager extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products_manager);
 
-        ImageButton addProductBtn      = (ImageButton) findViewById(R.id.addProductBtn);
-        ImageButton deleteProductBtn   = (ImageButton) findViewById(R.id.deleteProductBtn);
-        ImageButton listOfProductsBtn  = (ImageButton) findViewById(R.id.listOfProductsBtn);
+        ImageButton addProductBtn      = (ImageButton) findViewById(R.id.addNewItemBtn);
+        ImageButton deleteProductBtn   = (ImageButton) findViewById(R.id.deleteItemBtn);
+        ImageButton listOfProductsBtn  = (ImageButton) findViewById(R.id.listOfItemsBtn);
 
         addProductBtn.setOnClickListener(new View.OnClickListener() {
             @Override

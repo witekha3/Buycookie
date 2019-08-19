@@ -69,12 +69,12 @@
             android:padding="5dp" />
 
         <CheckBox
-            android:id="@+id/haveVatCheckBox"
+            android:id="@+id/have8VatCheckBox"
             android:layout_width="106dp"
             android:layout_height="49dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:text="Vat?" />
+            android:text="8% Vat?" />
 
         <Button
             android:id="@+id/saveClientBtn"
@@ -86,7 +86,7 @@
             android:textColor="#FF0000" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/errorMsg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

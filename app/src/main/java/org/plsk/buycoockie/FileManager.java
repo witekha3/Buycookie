@@ -46,6 +46,10 @@ public class FileManager {
     }
 
 
+    /**
+     * -- Handling with products file
+     * ===================================================
+     */
     public String getDataFromProductsTxt() {
         String text = "";
         final File file = new File(Environment.getExternalStorageDirectory()
@@ -85,14 +89,15 @@ public class FileManager {
     public void deleteFromProductsTxt(String name){
         Products product = new Products();
         String lineToDelete = "";
-        String data = getDataFromProductsTxt();
 
-        for(Products p : product.listOfProducts){
-            if(p.polishName.equals(name)){
-                lineToDelete = p.polishName+" / "+ p.slovakianName+" / "+(int)(p.weight)+" / "+p.price;
-                System.out.println(lineToDelete + " xx");
+        for(Products p : product.listOfProducts) {
+            if (p.polishName.equals(name)) {
+                String data = getDataFromProductsTxt();
 
-                data = data.replace(lineToDelete, "");
+                lineToDelete = p.polishName + " / " + p.slovakianName + " / " + (int) (p.weight) + " / " + String.format("%.2f",p.price)+"\\n";
+
+                data = data.replaceAll(lineToDelete, "");
+
 
                 /**
                  * Delete this line
@@ -103,7 +108,7 @@ public class FileManager {
                 FileOutputStream outStream = null;
 
                 out = new File(Environment.getExternalStorageDirectory()
-                        .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "products");
+                        .getAbsolutePath() + "/Android/data/org.plsk.buycoockie/files/", "products");
                 try {
                     PrintWriter writer = new PrintWriter(out);
                     writer.print(data);
@@ -114,4 +119,82 @@ public class FileManager {
             }
         }
     }
+
+
+    /**
+     * -- Handling with clients file
+     * ===================================================
+     */
+    public String getDataFromClientsTxt() {
+        String text = "";
+        final File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "clients");
+        try {
+            text = getStringFromFile(file.getAbsolutePath());
+
+        } catch (Exception e) {
+            System.out.println("error: "+e);
+        }
+        return text;
+    }
+
+    public void saveDataToClientsTxt(String text){
+        File out;
+        OutputStreamWriter outStreamWriter = null;
+        FileOutputStream outStream = null;
+
+        out = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "clients");
+        try {
+            outStream = new FileOutputStream(out, true);
+            outStreamWriter = new OutputStreamWriter(outStream);;
+            try {
+                outStreamWriter.append("\n"+text);
+                outStreamWriter.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public void deleteFromClientsTxt(String name){
+        Clients client = new Clients();
+        String lineToDelete = "";
+
+        for(Clients c : client.listOfClients) {
+            if ((c.companyName + " / " + c.adress).equals(name)) {
+                String data = getDataFromClientsTxt();
+
+                lineToDelete = c.acronim + " / " + c.companyName + " / " + c.nip + " / "
+                        + c.dic + " / " + c.adress + " / " + c.haveVat+"\\n";
+
+                data = data.replaceAll(lineToDelete, "");
+
+
+                /**
+                 * Delete this line
+                 ============================
+                 */
+                File out;
+                OutputStreamWriter outStreamWriter = null;
+                FileOutputStream outStream = null;
+
+                out = new File(Environment.getExternalStorageDirectory()
+                        .getAbsolutePath() + "/Android/data/org.plsk.buycoockie/files/", "clients");
+                try {
+                    PrintWriter writer = new PrintWriter(out);
+                    writer.print(data);
+                    writer.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
 }

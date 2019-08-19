@@ -7,9 +7,9 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class ShowProducts extends AppCompatActivity  {
+public class ShowClients extends AppCompatActivity {
 
-    Products products = new Products();
+    Clients client = new Clients();
     ArrayList<String> itemsArray;
     ArrayAdapter<String> adapter;
     ArrayList<String> arrayList;
@@ -17,14 +17,14 @@ public class ShowProducts extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_products);
+        setContentView(R.layout.activity_show_clients);
 
         arrayList = new ArrayList<String>();
         itemsArray = new ArrayList<String >();
         ListView listView = (ListView) findViewById(R.id.ListOfItems);
         itemsArray = new ArrayList<String >();
-        for (Products product : products.listOfProducts) {
-            itemsArray.add(product.polishName);
+        for (Clients client : client.listOfClients) {
+            itemsArray.add(client.companyName + " / " + client.adress);
         }
 
         for(String product : itemsArray){

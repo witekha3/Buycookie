@@ -12,13 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddClient"></activity>
+        <activity android:name=".ShowClients"></activity>
+        <activity android:name=".DeleteClient" />
+        <activity android:name=".ClientsManager" />
+        <activity android:name=".AddClient" />
         <activity android:name=".ShowProducts" />
         <activity android:name=".DeleteProduct" />
         <activity android:name=".AddProduct" />
         <activity android:name=".OrderManager" />
         <activity android:name=".ProductsManager" />
-        <activity android:name=".ClientsManager" />
         <activity android:name=".PrinterManager" />
         <activity android:name=".StartUp">
             <intent-filter>

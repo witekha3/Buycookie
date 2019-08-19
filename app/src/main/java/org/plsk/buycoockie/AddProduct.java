@@ -24,7 +24,7 @@ public class AddProduct extends AppCompatActivity {
         final CheckBox isSmall                       = (CheckBox) findViewById(R.id.isSmallCheckBox);
         final CheckBox isMedium                      = (CheckBox) findViewById(R.id.isMediumCheckBox);
         final CheckBox isBig                         = (CheckBox) findViewById(R.id.isBigCheckBox);
-        Button   addProductBtn           = (Button)   findViewById(R.id.addProductBtn);
+        Button   addProductBtn           = (Button)   findViewById(R.id.addNewItemBtn);
 
         addProductBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <ImageButton
-            android:id="@+id/addProductBtn"
+            android:id="@+id/addNewItemBtn"
             android:layout_width="104dp"
             android:layout_height="104dp"
             android:layout_gravity="center"
@@ -23,7 +23,7 @@
             app:srcCompat="@drawable/plus_image" />
 
         <ImageButton
-            android:id="@+id/deleteProductBtn"
+            android:id="@+id/deleteItemBtn"
             android:layout_width="104dp"
             android:layout_height="104dp"
             android:layout_gravity="center"
@@ -33,7 +33,7 @@
             app:srcCompat="@drawable/minus_image" />
 
         <ImageButton
-            android:id="@+id/listOfProductsBtn"
+            android:id="@+id/listOfItemsBtn"
             android:layout_width="104dp"
             android:layout_height="104dp"
             android:layout_gravity="center"

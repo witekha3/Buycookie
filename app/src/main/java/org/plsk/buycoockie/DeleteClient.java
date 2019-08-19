@@ -15,11 +15,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class DeleteProduct extends AppCompatActivity {
+public class DeleteClient extends AppCompatActivity {
 
-    Products products = new Products();
+    Clients client = new Clients();
     int image = R.drawable.minus_image;
-    ArrayList<String> productsName ;
+    ArrayList<String> clientsArray ;
     ListView listView;
     Dialog deleteProductDialog;
 
@@ -29,11 +29,11 @@ public class DeleteProduct extends AppCompatActivity {
         setContentView(R.layout.activity_delete_product);
 
         deleteProductDialog = new Dialog(this);
-        productsName = new ArrayList<String>();
+        clientsArray = new ArrayList<String>();
         listView   = (ListView) findViewById(R.id.listOfItemsToDelete);
 
-        for(Products product : products.listOfProducts){
-            productsName.add(product.polishName);
+        for(Clients c : client.listOfClients){
+            clientsArray.add(c.companyName + " / " + c.adress);
         }
 
         AdapterToDelete adapterToDelete = new AdapterToDelete();
@@ -42,8 +42,8 @@ public class DeleteProduct extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView selectedProdcut = (TextView) view.findViewById(R.id.itemToDelete);
-                final String nameOfSelectedProduct = selectedProdcut.getText().toString();
+                TextView selectedClient = (TextView) view.findViewById(R.id.itemToDelete);
+                final String nameOfSelectedClient = selectedClient.getText().toString();
 
 
                 deleteProductDialog.setContentView(R.layout.pop_up_delete_item);
@@ -52,7 +52,7 @@ public class DeleteProduct extends AppCompatActivity {
                 Button cancelBtn = (Button) deleteProductDialog.findViewById(R.id.donTDeleteItemBtn);
 
                 deleteProductDialog.show();
-                message.setText("Czy na pewno chcesz usunąć "+nameOfSelectedProduct+"?");
+                message.setText("Czy na pewno chcesz usunąć "+nameOfSelectedClient+"?");
 
                 cancelBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -65,8 +65,8 @@ public class DeleteProduct extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         FileManager fm = new FileManager();
-                        fm.deleteFromProductsTxt(nameOfSelectedProduct);
-                        Intent intent = new Intent(DeleteProduct.this, DeleteProduct.class);
+                        fm.deleteFromClientsTxt(nameOfSelectedClient);
+                        Intent intent = new Intent(DeleteClient.this, DeleteClient.class);
                         startActivity(intent);
                     }
                 });
@@ -74,12 +74,11 @@ public class DeleteProduct extends AppCompatActivity {
             }
         });
     }
-
-    class AdapterToDelete extends BaseAdapter{
+    class AdapterToDelete extends BaseAdapter {
 
         @Override
         public int getCount() {
-            return productsName.size();
+            return clientsArray.size();
         }
 
         @Override
@@ -100,10 +99,9 @@ public class DeleteProduct extends AppCompatActivity {
             TextView textView   = (TextView)  view.findViewById(R.id.itemToDelete);
 
             imageView.setImageResource(image);
-            textView.setText(productsName.get(position));
+            textView.setText(clientsArray.get(position));
 
             return view;
         }
     }
-
 }

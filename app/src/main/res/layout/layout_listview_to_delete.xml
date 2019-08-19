@@ -22,7 +22,7 @@
         app:srcCompat="@drawable/minus_image" />
 
     <TextView
-        android:id="@+id/nameToDeleteTxt"
+        android:id="@+id/itemToDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/minusImage"

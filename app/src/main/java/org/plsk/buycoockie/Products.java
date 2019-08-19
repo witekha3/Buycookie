@@ -14,7 +14,6 @@ public class Products {
         this.weight = weight;
         this.polishName = polishName;
         this.slovakianName = slovakianName;
-      //  addProductFromFile();
     }
 
     public Products(){
