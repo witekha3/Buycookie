@@ -58,11 +58,19 @@ public class AddProduct extends AppCompatActivity {
                     return;
                 }
                 errorTxt.setText("");
+
                 String text = polishProductNameTxt.getText()+plSize+" / "+slovakianProductNameTxt.getText()+
                         skSize+" / "+weightTxt.getText()+" / "+priceTxt.getText();
                 FileManager fileManager = new FileManager();
-                fileManager.saveDataToProductsTxt(text);
-                Toast.makeText(AddProduct.this, "Pomyślnie dodano nowy produkt!", Toast.LENGTH_SHORT).show();
+
+                if(!fileManager.getDataFromProductsTxt().contains(text)) {
+
+                    fileManager.saveDataToProductsTxt(text);
+                    Toast.makeText(AddProduct.this, "Pomyślnie dodano nowy produkt!", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(AddProduct.this, "Dany produkt już istnieje!", Toast.LENGTH_SHORT).show();
+                }
                 polishProductNameTxt.setText("");
                 slovakianProductNameTxt.setText("");
                 weightTxt.setText("");
