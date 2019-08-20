@@ -48,6 +48,13 @@ public class AddClient extends AppCompatActivity {
                     FileManager fm = new FileManager();
                     fm.saveDataToClientsTxt(newClient);
                     Toast.makeText(AddClient.this, "Pomyślnie dodano nowego clienta!", Toast.LENGTH_SHORT).show();
+                    acronimTxt.setText("");
+                    companyNameTxt.setText("");
+                    nipTxt.setText("");
+                    messageTxt.setText("");
+                    dicTxt.setText("");
+                    companyAdressTxt.setText("");
+                    haveVatCheckBox.setChecked(false);;
                 }
             }
         });

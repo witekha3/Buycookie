@@ -43,4 +43,9 @@ public class ClientsManager extends AppCompatActivity {
         });
 
     }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ClientsManager.this, MainActivity.class);
+        startActivity(intent);
+    }
 }

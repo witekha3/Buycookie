@@ -70,7 +70,6 @@ public class DeleteProduct extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-
             }
         });
     }
@@ -105,5 +104,9 @@ public class DeleteProduct extends AppCompatActivity {
             return view;
         }
     }
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(DeleteProduct.this, ProductsManager.class);
+        startActivity(intent);
+    }
 }

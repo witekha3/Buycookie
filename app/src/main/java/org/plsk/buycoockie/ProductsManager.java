@@ -41,4 +41,9 @@ public class ProductsManager extends AppCompatActivity {
             }
         });
     }
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ProductsManager.this, MainActivity.class);
+        startActivity(intent);
+    }
 }
