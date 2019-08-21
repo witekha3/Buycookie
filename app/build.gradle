@@ -27,4 +27,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation 'com.github.MdFarhanRaja:SearchableSpinner:1.2'
+    implementation 'com.itextpdf:itextg:5.5.10'
 }

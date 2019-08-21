@@ -197,4 +197,58 @@ public class FileManager {
     }
 
 
+    /**
+     * -- Handling with Invoice Files
+     * ===================================================
+     */
+
+    public String getDataFromInvoicesTxt(){
+        String text = "";
+        final File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "invoices");
+        try {
+            text = getStringFromFile(file.getAbsolutePath());
+
+        } catch (Exception e) {
+            System.out.println("error: "+e);
+        }
+        return text;
+    }
+
+    public void saveDataToInvoiceTxt(String text){
+        File out;
+        OutputStreamWriter outStreamWriter = null;
+        FileOutputStream outStream = null;
+
+        out = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "invoices");
+        try {
+            outStream = new FileOutputStream(out, true);
+            outStreamWriter = new OutputStreamWriter(outStream);;
+            try {
+                outStreamWriter.append("\n"+text);
+                outStreamWriter.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public void setDirectoryForInvoices() {
+        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+
+            File txtDirectory = new File(Environment.getExternalStorageDirectory().toString()  + "/Android/data/org.plsk.buycoockie/invoices/");
+            if(!txtDirectory.exists()){
+                txtDirectory.mkdirs();
+            }
+
+        } else if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED_READ_ONLY)) {
+        }
+
+    }
+
 }

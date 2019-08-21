@@ -67,6 +67,14 @@ public class OrderManager extends AppCompatActivity {
             }
         });
 
+        Button createInvoiceBtn = (Button) findViewById(R.id.createInvoiceBtn);
+        createInvoiceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InvoiceManager invoiceManager = new InvoiceManager(selectedItemsArray, selectedClient);
+                invoiceManager.createInvoicePdf(getApplicationContext());
+            }
+        });
 
     }
 
@@ -156,6 +164,7 @@ public class OrderManager extends AppCompatActivity {
 
             View view = getLayoutInflater().inflate(R.layout.layout_selected_product, null);
             Products product = selectedItemsArray.get(position);
+            calculateFullPrice();
 
             /**
              *  --  FOR LISTVIEW
@@ -191,8 +200,6 @@ public class OrderManager extends AppCompatActivity {
             amountTxt.setText(String.valueOf(amount));
             priceTxt.setText(String.valueOf(price));
             scoreTxt.setText(score);
-
-            calculateFullPrice();
 
             return view;
         }
@@ -263,24 +270,27 @@ public class OrderManager extends AppCompatActivity {
         return thisClient;
     }
 
-    private void calculateFullPrice(){
+    private double[] calculateFullPrice(){
         Button addDiscount = (Button) findViewById(R.id.addDiscountBtn);
         final TextView discountTxt = (TextView) findViewById(R.id.discountTxt);
+        final double[] price = {calculatePrice()};
 
         addDiscount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(discountTxt.getText().toString().isEmpty()){
-                    calculatePrice();
+                    price[0] = calculatePrice();
                 }
                 else{
                     double discount = Double.valueOf(discountTxt.getText().toString());
-                    double newPrice = discount*calculatePrice()+calculatePrice();
+                    double newPrice = calculatePrice() - discount/100*calculatePrice();
+                    price[1] = calculatePrice() - discount/100*calculatePrice();
                     TextView newPriceTxt = findViewById(R.id.allPriceTxt);
                     newPriceTxt.setText("Kwota: " + newPrice + " Euro");
                 }
             }
         });
+        return price;
     }
 
     private double calculatePrice(){
