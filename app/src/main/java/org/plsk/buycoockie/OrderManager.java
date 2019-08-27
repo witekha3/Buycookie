@@ -71,7 +71,7 @@ public class OrderManager extends AppCompatActivity {
         createInvoiceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InvoiceManager invoiceManager = new InvoiceManager(selectedItemsArray, selectedClient);
+                InvoiceManager invoiceManager = new InvoiceManager(selectedItemsArray, selectedClient, calculateFullPrice()[0]);
                 invoiceManager.createInvoicePdf(getApplicationContext());
             }
         });
@@ -284,7 +284,7 @@ public class OrderManager extends AppCompatActivity {
                 else{
                     double discount = Double.valueOf(discountTxt.getText().toString());
                     double newPrice = calculatePrice() - discount/100*calculatePrice();
-                    price[1] = calculatePrice() - discount/100*calculatePrice();
+                    price[0] = calculatePrice() - discount/100*calculatePrice();
                     TextView newPriceTxt = findViewById(R.id.allPriceTxt);
                     newPriceTxt.setText("Kwota: " + newPrice + " Euro");
                 }

@@ -208,7 +208,6 @@ public class FileManager {
                 .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "invoices");
         try {
             text = getStringFromFile(file.getAbsolutePath());
-
         } catch (Exception e) {
             System.out.println("error: "+e);
         }
@@ -224,10 +223,11 @@ public class FileManager {
                 .getAbsolutePath() +"/Android/data/org.plsk.buycoockie/files/", "invoices");
         try {
             outStream = new FileOutputStream(out, true);
-            outStreamWriter = new OutputStreamWriter(outStream);;
+            outStreamWriter = new OutputStreamWriter(outStream);
             try {
-                outStreamWriter.append("\n"+text);
+                outStreamWriter.append(text+"\n");
                 outStreamWriter.flush();
+                outStreamWriter.close();
 
             } catch (IOException e) {
                 e.printStackTrace();
