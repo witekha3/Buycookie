@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PrinterManager">
 
-</android.support.constraint.ConstraintLayout>
+    <ListView
+        android:id="@+id/listOfPdfFiles"
+        style="@android:style/Widget.DeviceDefault.Light.ExpandableListView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#004257EB"
+        android:cacheColorHint="#4D54EB"
+        android:clickable="false"
+        android:drawSelectorOnTop="false">
+
+    </ListView>
+
+</LinearLayout>

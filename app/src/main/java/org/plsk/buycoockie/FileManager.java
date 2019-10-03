@@ -95,7 +95,6 @@ public class FileManager {
                 String data = getDataFromProductsTxt();
 
                 lineToDelete = p.polishName + " / " + p.slovakianName + " / " + (int) (p.weight) + " / " + String.format("%.2f",p.price)+"\\n";
-
                 data = data.replaceAll(lineToDelete, "");
 
 
@@ -104,9 +103,6 @@ public class FileManager {
                  ============================
                  */
                 File out;
-                OutputStreamWriter outStreamWriter = null;
-                FileOutputStream outStream = null;
-
                 out = new File(Environment.getExternalStorageDirectory()
                         .getAbsolutePath() + "/Android/data/org.plsk.buycoockie/files/", "products");
                 try {

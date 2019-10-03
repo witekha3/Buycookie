@@ -21,7 +21,9 @@
             android:layout_marginTop="200dp"
             android:background="#00FCFBFB"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/cake_image" />
+            app:srcCompat="@drawable/cake_image"
+            android:text="Produkty"
+            android:drawableBottom="@drawable/cake_image"/>
 
         <ImageButton
             android:id="@+id/clientsBtn"

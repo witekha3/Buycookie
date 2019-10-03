@@ -1,5 +1,6 @@
 package org.plsk.buycoockie;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -67,6 +68,10 @@ public class AddProduct extends AppCompatActivity {
 
                     fileManager.saveDataToProductsTxt(text);
                     Toast.makeText(AddProduct.this, "Pomyślnie dodano nowy produkt!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(0, 0);
+                    startActivity(getIntent());
+                    overridePendingTransition(0, 0);
                 }
                 else{
                     Toast.makeText(AddProduct.this, "Dany produkt już istnieje!", Toast.LENGTH_SHORT).show();
