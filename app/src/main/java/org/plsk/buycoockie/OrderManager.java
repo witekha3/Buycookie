@@ -180,12 +180,13 @@ public class OrderManager extends AppCompatActivity {
 
 
 
-            String productName = product.polishName;
-            double amount      = product.weight;
-            double price       = product.price;
+
             DecimalFormat df = new DecimalFormat();
             df.setMaximumFractionDigits(2);
             String score;
+            String productName = product.polishName;
+            double amount      = Double.valueOf(df.format(product.weight));
+            double price       = Double.valueOf(df.format(product.price));
 
             if(selectedClient.haveVat){
                 vatTxt.setText("8%VAT");
@@ -193,6 +194,7 @@ public class OrderManager extends AppCompatActivity {
             }else {
                 vatTxt.setText("0%VAT");
                 score = String.valueOf(df.format(amount*price));
+
             }
 
 
@@ -247,6 +249,7 @@ public class OrderManager extends AppCompatActivity {
 
                 listView.setAdapter(selectedItemAdapter);
                 changeProductValueDialog.dismiss();
+                calculateFullPrice();
             }
         });
 
@@ -283,10 +286,16 @@ public class OrderManager extends AppCompatActivity {
                 }
                 else{
                     double discount = Double.valueOf(discountTxt.getText().toString());
-                    double newPrice = calculatePrice() - discount/100*calculatePrice();
+
                     price[0] = calculatePrice() - discount/100*calculatePrice();
-                    TextView newPriceTxt = findViewById(R.id.allPriceTxt);
-                    newPriceTxt.setText("Kwota: " + newPrice + " Euro");
+                    DecimalFormat df = new DecimalFormat();
+                    df.setMaximumFractionDigits(2);
+                    String newPriceStr = df.format(price[0]);
+                    price[0]= Double.valueOf(newPriceStr);
+
+                    TextView priceTxt = findViewById(R.id.allPriceTxt);
+                    priceTxt.setText("Kwota: "+String.valueOf(price[0])+" Euro");
+
                 }
             }
         });
@@ -297,6 +306,11 @@ public class OrderManager extends AppCompatActivity {
         double price=0;
         for(Products p : selectedItemsArray){
             price += p.price * p.weight;
+            DecimalFormat df = new DecimalFormat();
+            df.setMaximumFractionDigits(2);
+            String newPriceStr = df.format(price);
+
+            price = Double.valueOf(newPriceStr);
         }
         TextView priceTxt = findViewById(R.id.allPriceTxt);
         priceTxt.setText("Kwota: "+String.valueOf(price)+" Euro");
