@@ -1,23 +1,33 @@
 package org.plsk.buycoockie;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Objects;
 
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
@@ -42,6 +52,9 @@ public class OrderManager extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_manager);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
 
         selectedItemAdapter = new SelectedItemAdapter();
         changeProductValueDialog = new Dialog(this);
@@ -73,9 +86,11 @@ public class OrderManager extends AppCompatActivity {
             public void onClick(View v) {
                 InvoiceManager invoiceManager = new InvoiceManager(selectedItemsArray, selectedClient, calculateFullPrice()[0]);
                 invoiceManager.createInvoicePdf(getApplicationContext());
+                //progressBar.setVisibility(View.INVISIBLE);
+                Intent intent = new Intent(OrderManager.this, PrinterManager.class);
+                startActivity(intent);
             }
         });
-
     }
 
     private void initClients() {
@@ -185,8 +200,8 @@ public class OrderManager extends AppCompatActivity {
             df.setMaximumFractionDigits(2);
             String score;
             String productName = product.polishName;
-            double amount      = Double.valueOf(df.format(product.weight));
-            double price       = Double.valueOf(df.format(product.price));
+            double amount      = Double.valueOf(df.format(product.weight).replace(",", "."));
+            double price       = Double.valueOf(df.format(product.price).replace(",", "."));
 
             if(selectedClient.haveVat){
                 vatTxt.setText("8%VAT");
@@ -275,6 +290,7 @@ public class OrderManager extends AppCompatActivity {
 
     private double[] calculateFullPrice(){
         Button addDiscount = (Button) findViewById(R.id.addDiscountBtn);
+
         final TextView discountTxt = (TextView) findViewById(R.id.discountTxt);
         final double[] price = {calculatePrice()};
 
@@ -291,7 +307,7 @@ public class OrderManager extends AppCompatActivity {
                     DecimalFormat df = new DecimalFormat();
                     df.setMaximumFractionDigits(2);
                     String newPriceStr = df.format(price[0]);
-                    price[0]= Double.valueOf(newPriceStr);
+                    price[0]= Double.valueOf(newPriceStr.replace(",", "."));
 
                     TextView priceTxt = findViewById(R.id.allPriceTxt);
                     priceTxt.setText("Kwota: "+String.valueOf(price[0])+" Euro");
@@ -305,12 +321,16 @@ public class OrderManager extends AppCompatActivity {
     private double calculatePrice(){
         double price=0;
         for(Products p : selectedItemsArray){
+
             price += p.price * p.weight;
+            DecimalFormatSymbols decimalSymbol = new DecimalFormatSymbols(Locale.ENGLISH);
+            decimalSymbol.setDecimalSeparator('.');
             DecimalFormat df = new DecimalFormat();
             df.setMaximumFractionDigits(2);
             String newPriceStr = df.format(price);
 
-            price = Double.valueOf(newPriceStr);
+            price = Double.valueOf(newPriceStr.replace(",", "."));
+
         }
         TextView priceTxt = findViewById(R.id.allPriceTxt);
         priceTxt.setText("Kwota: "+String.valueOf(price)+" Euro");

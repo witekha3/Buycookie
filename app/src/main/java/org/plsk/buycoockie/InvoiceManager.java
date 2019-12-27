@@ -8,7 +8,6 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
@@ -24,18 +23,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import pl.allegro.finance.tradukisto.MoneyConverters;
-import pl.allegro.finance.tradukisto.ValueConverters;
 
 public class InvoiceManager {
+
     ArrayList<Products> pruchasedItems = new ArrayList<Products>();
     Clients client;
     Double price;
     Font crimsonromanFont;
     String mFileName;
     String currentDateandTime;
+
+    PdfPTable table = new PdfPTable(1);
+
+    PdfPCell cell1, cell2, cell3, cell4, cell5, cell6;
 
     public InvoiceManager(ArrayList<Products> purchasedItems, Clients client, double price){
         this.pruchasedItems = purchasedItems;
@@ -46,6 +48,284 @@ public class InvoiceManager {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyyy");
         currentDateandTime = sdf.format(new Date());
         mFileName = getInvoiceName();
+    }
+
+    private String getInvoiceName(){
+        FileManager fm = new FileManager();
+        fm.setDirectoryForInvoices();
+        String invoiceName = "";
+        if(fm.getDataFromInvoicesTxt().isEmpty()){
+            invoiceName = "Wz-"+1+"-"+ Calendar.getInstance().get(Calendar.YEAR)+"-S";
+            fm.saveDataToInvoiceTxt(invoiceName);
+        }else{
+            String lines[] = fm.getDataFromInvoicesTxt().split("[\r\n]+");
+            if (lines.length != 0) {
+                for (String line : lines) {
+                    String tab[] = line.split("-");
+                    int invoiceNr = Integer.valueOf(tab[1])+1;
+                    invoiceName = "Wz-"+invoiceNr+"-"+ Calendar.getInstance().get(Calendar.YEAR)+"-S";
+                    fm.saveDataToInvoiceTxt(invoiceName);
+                }
+            }
+        }
+        return invoiceName;
+    }
+
+    private Font getFontForInvoice(){
+
+        BaseFont crimsonroman = null;
+        try {
+            crimsonroman = BaseFont.createFont("res/font/crimsonroman.ttf", "WINDOWS-1250",BaseFont.EMBEDDED);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Font(crimsonroman, 12);
+    }
+
+    private Paragraph invoiceSumUmPrice(){
+
+        MoneyConverters moneyConverters = MoneyConverters.POLISH_BANKING_MONEY_VALUE;
+
+        if(client.haveVat) {
+            String finalPrice = String.format("%.2f", price+price*0.08);
+            //String moneyAsWords = moneyConverters.asWords(new BigDecimal(finalPrice));
+            return new Paragraph("Razem do zaplaty: " + finalPrice +"\n"
+                    /*+"Słownie: " + moneyAsWords, crimsonromanFont*/);
+        }
+        else{
+         //   String moneyAsWords = moneyConverters.asWords(new BigDecimal(price));
+            return new Paragraph("Razem do zapłaty: " + price + "\n"
+                    /*+"Słownie: " + moneyAsWords, crimsonromanFont*/);
+        }
+    }
+
+
+    private Paragraph invoiceTitle(){
+        return new Paragraph(
+                "Firma Cukierniczo Gastronomiczna GRZEŚ spółka z Ograniczoną " +
+                        "Odpowiedzialnością Spółka Komandytowa (DAWNIEJ: Firma Cukierniczo" +
+                        "Gastronoiczna 'GRZEŚ' R. Ząber G Z Krańcowa 4)", crimsonromanFont);
+    }
+
+    private PdfPTable invoiceCompanyData(){
+        table = new PdfPTable(1);
+        cell1   = new PdfPCell(new Phrase(
+                "33-335\n" +
+                        "Tel: 18-445-78-17\n" +
+                        "E-mail: firmagrzes@interia.pl\n" +
+                        "NIP: PL 734-327-73-19\n" +
+                        "Bank: ING Bank Śląski S.A O. w Nowym Sączu\n" +
+                        "7010501722100000903165025", crimsonromanFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        return table;
+    }
+
+    private PdfPTable invoiceInfo() {
+        table = new PdfPTable(2);
+        cell1 = new PdfPCell();
+        cell2     = new PdfPCell(new Phrase(
+                "Faktura VAT / Dowód dostawy\n" +
+                        "Nr:"+mFileName+"\n" +
+                        "Data wystawienia: "+currentDateandTime+"\n" +
+                        "Data realizacji: "+currentDateandTime, crimsonromanFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        return table;
+    }
+
+    private PdfPTable invoiceClientInfo(){
+        table = new PdfPTable(2);
+        cell1 = new PdfPCell(new Paragraph("Nabywca \n" +
+                client.companyName+"\n"+
+                client.adress+"\n"+
+                client.dic+"\n"+
+                "NIP: "+ client.nip+"\n"+
+                "Srodek transportu: KNS 80850", crimsonromanFont));
+
+        cell2 = new PdfPCell(new Paragraph("Odbiorca\n"
+                +client.companyName+"\n"+
+                client.adress+"\n"+
+                client.dic+"\n"+
+                "NIP: "+ client.nip+"\n", crimsonromanFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        return table;
+    }
+
+    private PdfPTable invoiceOrderInformationTitle(){
+        table = new PdfPTable(5);
+        cell1  = new PdfPCell(new Phrase("Nazwa", crimsonromanFont));
+        cell2  = new PdfPCell(new Phrase("Waga / Ilość", crimsonromanFont));
+        cell3  = new PdfPCell(new Phrase("JM Cena", crimsonromanFont));
+        cell4  = new PdfPCell(new Phrase("Wartość", crimsonromanFont));
+        cell5  = new PdfPCell(new Phrase("Vat%", crimsonromanFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell5.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        table.addCell(cell5);
+        return table;
+    }
+
+    private PdfPTable invoiceOrderInformationData(Products product, String clientVat){
+        table = new PdfPTable(6);
+        cell1   = new PdfPCell(new Phrase(product.polishName, crimsonromanFont));
+        cell2   = new PdfPCell(new Phrase(String.valueOf(product.weight), crimsonromanFont));
+        cell3 = new PdfPCell(new Phrase(String.valueOf(product.price), crimsonromanFont));
+        cell4  = new PdfPCell(new Phrase(String.valueOf(product.price*product.weight), crimsonromanFont));
+        cell5  = new PdfPCell(new Phrase(clientVat, crimsonromanFont));
+        cell6   = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell5.setBorder(Rectangle.NO_BORDER);
+        cell6.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell6);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        table.addCell(cell5);
+        return  table;
+    }
+
+    private  PdfPTable invoicePaymentsMethodTitle(){
+        table = new PdfPTable(4);
+        cell1   = new PdfPCell(new Phrase("Forma Platnosci", crimsonromanFont));
+        cell2   = new PdfPCell(new Phrase("Termin", crimsonromanFont));
+        cell3 = new PdfPCell(new Phrase(" "));
+        cell4  = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        return table;
+    }
+
+    private  PdfPTable invoicePaymentsMethodData(){
+        table = new PdfPTable(4);
+        cell1   = new PdfPCell(new Phrase("Gotowka", crimsonromanFont));
+        cell2   = new PdfPCell(new Phrase("FA + 0 dni", crimsonromanFont));
+        cell3 = new PdfPCell(new Phrase(" "));
+        cell4  = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        return table;
+    }
+
+    private  PdfPTable invoiceVatTitle(){
+        table = new PdfPTable(5);
+        cell1   = new PdfPCell(new Phrase("Stawka VAT",crimsonromanFont));
+        cell2   = new PdfPCell(new Phrase("Wartosc netto",crimsonromanFont));
+        cell3 = new PdfPCell(new Phrase("Wartosc VAT",crimsonromanFont));
+        cell4  = new PdfPCell(new Phrase("Wartosc brutto",crimsonromanFont));
+        cell5  = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell5.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        table.addCell(cell5);
+        return  table;
+    }
+
+    private PdfPTable invoiceVatData(){
+        table = new PdfPTable(5);
+        if(client.haveVat){
+            cell1   = new PdfPCell(new Phrase("C 8.0%",crimsonromanFont));
+            cell2 = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+            cell3  = new PdfPCell(new Phrase(String.format("%.2f", price*0.08),crimsonromanFont));
+            cell4  = new PdfPCell(new Phrase(String.format("%.2f", price + price*0.08), crimsonromanFont));
+        }else{
+            cell1   = new PdfPCell(new Phrase("C 0.0%",crimsonromanFont));
+            cell2  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+            cell3 = new PdfPCell(new Phrase("0.00",crimsonromanFont));
+            cell4  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+
+        }
+        cell5   = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell5.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        table.addCell(cell5);
+        return table;
+    }
+
+    private PdfPTable invoiceVatData2(){
+        table = new PdfPTable(5);
+        if(client.haveVat){
+            cell2 = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+            cell3  = new PdfPCell(new Phrase(String.format("%.2f", price*0.08),crimsonromanFont));
+            cell4  = new PdfPCell(new Phrase(String.format("%.2f", price + price*0.08), crimsonromanFont));
+        }else{
+            cell2  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+            cell3 = new PdfPCell(new Phrase("0.00",crimsonromanFont));
+            cell4  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
+
+        }
+        cell1   = new PdfPCell(new Phrase("Razem",crimsonromanFont));
+        cell5   = new PdfPCell(new Phrase(""));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        cell3.setBorder(Rectangle.NO_BORDER);
+        cell4.setBorder(Rectangle.NO_BORDER);
+        cell5.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        table.addCell(cell3);
+        table.addCell(cell4);
+        table.addCell(cell5);
+        return table;
+    }
+
+    private PdfPTable invoicePersonPermision(){
+        table = new PdfPTable(2);
+        cell1   = new PdfPCell(new Phrase("Uprawnienia do wystawienia dokumentu", crimsonromanFont));
+        cell2   = new PdfPCell(new Phrase("Uprawnienia do odbioru dokumentu", crimsonromanFont));
+        cell1.setBorder(Rectangle.NO_BORDER);
+        cell2.setBorder(Rectangle.NO_BORDER);
+        table.addCell(cell1);
+        table.addCell(cell2);
+        return table;
+    }
+
+    private Paragraph invoiceNotifyReception(){
+        Paragraph reception = new Paragraph("odbiór " + currentDateandTime);
+        reception.setAlignment(Element.ALIGN_CENTER);
+        return reception;
 
     }
 
@@ -57,10 +337,6 @@ public class InvoiceManager {
         try{
             PdfWriter.getInstance(myDoc, new FileOutputStream(mFilePath));
             myDoc.open();
-/**
- *  ---------- SPLITERS
- *  ========================================================================
- */
 
             Paragraph splitOne = new Paragraph("============================================================");
             Paragraph splitTwo = new Paragraph("--------------------------------" +
@@ -71,7 +347,6 @@ public class InvoiceManager {
             splitOne.setAlignment(Element.ALIGN_CENTER);
             splitTwo.setAlignment(Element.ALIGN_CENTER);
 /**
- * ------------------- INVOICE TITLE
  * =================================================================================
  */
             myDoc.add(invoiceTitle());
@@ -160,9 +435,7 @@ public class InvoiceManager {
             myDoc.add(new Paragraph(" "));
             myDoc.add(new Paragraph(" "));
             myDoc.add(new Paragraph(" "));
-            myDoc.add(new Paragraph(invoiceNotifyReception()));
-
-
+            //myDoc.add(new Paragraph(invoiceNotifyReception()));
 
 
             myDoc.close();
@@ -170,292 +443,8 @@ public class InvoiceManager {
 
         }catch(Exception e){
             Toast.makeText(context, "Błąd: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage() + "  xxx");
-
         }
 
-
-    }
-
-
-    private String getInvoiceName(){
-        FileManager fm = new FileManager();
-        fm.setDirectoryForInvoices();
-        String invoiceName = "";
-        if(fm.getDataFromInvoicesTxt().isEmpty()){
-            invoiceName = "Wz-"+1+"-"+ Calendar.getInstance().get(Calendar.YEAR)+"-S";
-            fm.saveDataToInvoiceTxt(invoiceName);
-        }else{
-            String lines[] = fm.getDataFromInvoicesTxt().split("[\r\n]+");
-            if (lines.length != 0) {
-                for (String line : lines) {
-                    String tab[] = line.split("-");
-                    int invoiceNr = Integer.valueOf(tab[1])+1;
-                    invoiceName = "Wz-"+invoiceNr+"-"+ Calendar.getInstance().get(Calendar.YEAR)+"-S";
-                    fm.saveDataToInvoiceTxt(invoiceName);
-                }
-            }
-        }
-        return invoiceName;
-    }
-
-    private Font getFontForInvoice(){
-
-        BaseFont crimsonroman = null;
-        try {
-            crimsonroman = BaseFont.createFont("res/font/crimsonroman.ttf", "ISO 8859-2",BaseFont.EMBEDDED);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new Font(crimsonroman, 12);
-    }
-
-    private Paragraph invoiceTitle(){
-        return new Paragraph(
-                "Firma Cukierniczo Gastronomiczna GRZEŚ spółka z Ograniczoną " +
-                        "Odpowiedzialnością Spółka Komandytowa (DAWNIEJ: Firma Cukierniczo" +
-                        "Gastronoiczna 'GRZEŚ' R. Ząber G Z Krańcowa 4)", crimsonromanFont);
-
-    }
-
-    private PdfPTable invoiceCompanyData(){
-        PdfPTable splitSideOnOne    = new PdfPTable(1);
-        PdfPCell companyData   = new PdfPCell(new Phrase(
-                "33-335\n" +
-                        "Tel: 18-445-78-17\n" +
-                        "E-mail: firmagrzes@interia.pl\n" +
-                        "NIP: PL 734-327-73-19\n" +
-                        "Bank: ING Bank Śląski S.A O. w Nowym Sączu\n" +
-                        "7010501722100000903165025", crimsonromanFont));
-        companyData.setBorder(Rectangle.NO_BORDER);
-        splitSideOnOne.addCell(companyData);
-        return splitSideOnOne;
-    }
-
-    private PdfPTable invoiceInfo() {
-        PdfPTable splitSideOnTwo    = new PdfPTable(2);
-        PdfPCell firstSplit = new PdfPCell();
-        PdfPCell secondSplit     = new PdfPCell(new Phrase(
-                "Faktura VAT / Dowód dostawy\n" +
-                        "Nr:"+mFileName+"\n" +
-                        "Data wystawienia: "+currentDateandTime+"\n" +
-                        "Data realizacji: "+currentDateandTime, crimsonromanFont));
-        firstSplit.setBorder(Rectangle.NO_BORDER);
-        secondSplit.setBorder(Rectangle.NO_BORDER);
-        splitSideOnTwo.addCell(firstSplit);
-        splitSideOnTwo.addCell(secondSplit);
-        return splitSideOnTwo;
-    }
-
-    private PdfPTable invoiceClientInfo(){
-        PdfPTable splitSideOnTwo    = new PdfPTable(2);
-        PdfPCell firstSplit = new PdfPCell(new Paragraph("Nabywca \n" +
-                client.companyName+"\n"+
-                client.adress+"\n"+
-                client.dic+"\n"+
-                "NIP: "+ client.nip+"\n"+
-                "Srodek transportu: KNS 80850", crimsonromanFont));
-
-        PdfPCell secondSplit = new PdfPCell(new Paragraph("Odbiorca\n"
-                +client.companyName+"\n"+
-                client.adress+"\n"+
-                client.dic+"\n"+
-                "NIP: "+ client.nip+"\n", crimsonromanFont));
-        firstSplit.setBorder(Rectangle.NO_BORDER);
-        secondSplit.setBorder(Rectangle.NO_BORDER);
-        splitSideOnTwo.addCell(firstSplit);
-        splitSideOnTwo.addCell(secondSplit);
-        return splitSideOnTwo;
-    }
-
-    private PdfPTable invoiceOrderInformationTitle(){
-        PdfPTable discribeTxt = new PdfPTable(5);
-        PdfPCell nameTxt   = new PdfPCell(new Phrase("Nazwa", crimsonromanFont));
-        PdfPCell amountTxt = new PdfPCell(new Phrase("Waga / Ilość", crimsonromanFont));
-        PdfPCell priceTxt  = new PdfPCell(new Phrase("JM Cena", crimsonromanFont));
-        PdfPCell valueTxt  = new PdfPCell(new Phrase("Wartość", crimsonromanFont));
-        PdfPCell vatTxt    = new PdfPCell(new Phrase("Vat%", crimsonromanFont));
-        nameTxt.setBorder(Rectangle.NO_BORDER);
-        amountTxt.setBorder(Rectangle.NO_BORDER);
-        priceTxt.setBorder(Rectangle.NO_BORDER);
-        valueTxt.setBorder(Rectangle.NO_BORDER);
-        vatTxt.setBorder(Rectangle.NO_BORDER);
-        discribeTxt.addCell(nameTxt);
-        discribeTxt.addCell(amountTxt);
-        discribeTxt.addCell(priceTxt);
-        discribeTxt.addCell(valueTxt);
-        discribeTxt.addCell(vatTxt);
-        return discribeTxt;
-    }
-
-    private PdfPTable invoiceOrderInformationData(Products product, String clientVat){
-        PdfPTable productsTable    = new PdfPTable(6);
-        PdfPCell cellOne   = new PdfPCell(new Phrase(product.polishName, crimsonromanFont));
-        PdfPCell cellTwo   = new PdfPCell(new Phrase(String.valueOf(product.weight), crimsonromanFont));
-        PdfPCell cellThree = new PdfPCell(new Phrase(String.valueOf(product.price), crimsonromanFont));
-        PdfPCell cellFour  = new PdfPCell(new Phrase(String.valueOf(product.price*product.weight), crimsonromanFont));
-        PdfPCell cellFive  = new PdfPCell(new Phrase(clientVat, crimsonromanFont));
-        PdfPCell cellSix   = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        cellFive.setBorder(Rectangle.NO_BORDER);
-        cellSix.setBorder(Rectangle.NO_BORDER);
-        productsTable.addCell(cellOne);
-        productsTable.addCell(cellSix);
-        productsTable.addCell(cellTwo);
-        productsTable.addCell(cellThree);
-        productsTable.addCell(cellFour);
-        productsTable.addCell(cellFive);
-        return  productsTable;
-    }
-
-    private  PdfPTable invoicePaymentsMethodTitle(){
-        PdfPTable paymentsMethodTable    = new PdfPTable(4);
-        PdfPCell cellOne   = new PdfPCell(new Phrase("Forma Platnosci", crimsonromanFont));
-        PdfPCell cellTwo   = new PdfPCell(new Phrase("Termin", crimsonromanFont));
-        PdfPCell cellThree = new PdfPCell(new Phrase(" "));
-        PdfPCell cellFour  = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        paymentsMethodTable.addCell(cellOne);
-        paymentsMethodTable.addCell(cellTwo);
-        paymentsMethodTable.addCell(cellThree);
-        paymentsMethodTable.addCell(cellFour);
-        return paymentsMethodTable;
-    }
-
-    private  PdfPTable invoicePaymentsMethodData(){
-        PdfPTable paymentsMethodTable    = new PdfPTable(4);
-        PdfPCell cellOne   = new PdfPCell(new Phrase("Gotowka", crimsonromanFont));
-        PdfPCell cellTwo   = new PdfPCell(new Phrase("FA + 0 dni", crimsonromanFont));
-        PdfPCell cellThree = new PdfPCell(new Phrase(" "));
-        PdfPCell cellFour  = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        paymentsMethodTable.addCell(cellOne);
-        paymentsMethodTable.addCell(cellTwo);
-        paymentsMethodTable.addCell(cellThree);
-        paymentsMethodTable.addCell(cellFour);
-        return paymentsMethodTable;
-    }
-
-    private  PdfPTable invoiceVatTitle(){
-        PdfPTable splitSideOnFive    = new PdfPTable(5);
-        PdfPCell cellOne   = new PdfPCell(new Phrase("Stawka VAT",crimsonromanFont));
-        PdfPCell cellTwo   = new PdfPCell(new Phrase("Wartosc netto",crimsonromanFont));
-        PdfPCell cellThree = new PdfPCell(new Phrase("Wartosc VAT",crimsonromanFont));
-        PdfPCell cellFour  = new PdfPCell(new Phrase("Wartosc brutto",crimsonromanFont));
-        PdfPCell cellFive  = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        cellFive.setBorder(Rectangle.NO_BORDER);
-        splitSideOnFive.addCell(cellOne);
-        splitSideOnFive.addCell(cellTwo);
-        splitSideOnFive.addCell(cellThree);
-        splitSideOnFive.addCell(cellFour);
-        splitSideOnFive.addCell(cellFive);
-        return  splitSideOnFive;
-    }
-
-    private PdfPTable invoiceVatData(){
-        PdfPTable paymentsMethodTable    = new PdfPTable(5);
-        PdfPCell cellOne, cellTwo, cellThree, cellFour, cellFive;
-        if(client.haveVat){
-            cellOne   = new PdfPCell(new Phrase("C 8.0%",crimsonromanFont));
-            cellTwo = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-            cellThree  = new PdfPCell(new Phrase(String.format("%.2f", price*0.08),crimsonromanFont));
-            cellFour  = new PdfPCell(new Phrase(String.format("%.2f", price + price*0.08), crimsonromanFont));
-        }else{
-            cellOne   = new PdfPCell(new Phrase("C 0.0%",crimsonromanFont));
-            cellTwo  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-            cellThree = new PdfPCell(new Phrase("0.00",crimsonromanFont));
-            cellFour  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-
-        }
-        cellFive   = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        cellFive.setBorder(Rectangle.NO_BORDER);
-        paymentsMethodTable.addCell(cellOne);
-        paymentsMethodTable.addCell(cellTwo);
-        paymentsMethodTable.addCell(cellThree);
-        paymentsMethodTable.addCell(cellFour);
-        paymentsMethodTable.addCell(cellFive);
-        return paymentsMethodTable;
-    }
-
-    private PdfPTable invoiceVatData2(){
-        PdfPTable paymentsMethodTable    = new PdfPTable(5);
-        PdfPCell cellOne, cellTwo, cellThree, cellFour, cellFive;
-        if(client.haveVat){
-            cellTwo = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-            cellThree  = new PdfPCell(new Phrase(String.format("%.2f", price*0.08),crimsonromanFont));
-            cellFour  = new PdfPCell(new Phrase(String.format("%.2f", price + price*0.08), crimsonromanFont));
-        }else{
-            cellTwo  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-            cellThree = new PdfPCell(new Phrase("0.00",crimsonromanFont));
-            cellFour  = new PdfPCell(new Phrase(price.toString(), crimsonromanFont));
-
-        }
-        cellOne   = new PdfPCell(new Phrase("Razem",crimsonromanFont));
-        cellFive   = new PdfPCell(new Phrase(""));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        cellThree.setBorder(Rectangle.NO_BORDER);
-        cellFour.setBorder(Rectangle.NO_BORDER);
-        cellFive.setBorder(Rectangle.NO_BORDER);
-        paymentsMethodTable.addCell(cellOne);
-        paymentsMethodTable.addCell(cellTwo);
-        paymentsMethodTable.addCell(cellThree);
-        paymentsMethodTable.addCell(cellFour);
-        paymentsMethodTable.addCell(cellFive);
-        return paymentsMethodTable;
-    }
-
-    private PdfPTable invoicePersonPermision(){
-        PdfPTable paymentsMethodTable    = new PdfPTable(2);
-        PdfPCell cellOne   = new PdfPCell(new Phrase("Uprawnienia do wystawienia dokumentu", crimsonromanFont));
-        PdfPCell cellTwo   = new PdfPCell(new Phrase("Uprawnienia do odbioru dokumentu", crimsonromanFont));
-        cellOne.setBorder(Rectangle.NO_BORDER);
-        cellTwo.setBorder(Rectangle.NO_BORDER);
-        paymentsMethodTable.addCell(cellOne);
-        paymentsMethodTable.addCell(cellTwo);
-        return paymentsMethodTable;
-    }
-
-    private Paragraph invoiceSumUmPrice(){
-
-        MoneyConverters moneyConverters = MoneyConverters.SLOVAK_BANKING_MONEY_VALUE;
-
-        if(client.haveVat) {
-            String finalPrice = String.format("%.2f", price+price*0.08);
-            String moneyAsWords = moneyConverters.asWords(new BigDecimal(finalPrice));
-            return new Paragraph("Razem do zaplaty: " + finalPrice +"\n"
-                    +"Słownie: " + moneyAsWords, crimsonromanFont);
-        }
-        else{
-            String moneyAsWords = moneyConverters.asWords(new BigDecimal(price));
-            return new Paragraph("Razem do zapłaty: " + price + "\n"
-                    +"Słownie: " + moneyAsWords, crimsonromanFont);
-        }
-    }
-
-    private Paragraph invoiceNotifyReception(){
-        Paragraph reception = new Paragraph("odbiór " + currentDateandTime);
-        reception.setAlignment(Element.ALIGN_CENTER);
-        return reception;
 
     }
 
